@@ -28,7 +28,7 @@ static char	*create_line_str(t_list **head, size_t line_len)
 	while (i < line_len && current)
 	{
 		j = 0;
-		while (current->content[j] && i < line_len)
+		while (current && current->content[j] && i < line_len)
 		{
 			line_str[i++] = current->content[j];
 			if (current->content[j] == '\n')
@@ -51,6 +51,7 @@ static char	*extract_line(t_list **head, t_list **current, size_t *line_len)
 {
 	char	*new_line;
 	char	*line_str;
+	char	*stash;
 
 	new_line = ft_strchr((*current)->content, '\n');
 	if (!new_line)
@@ -60,8 +61,15 @@ static char	*extract_line(t_list **head, t_list **current, size_t *line_len)
 	}
 	*line_len += (new_line - (*current)->content) + 1;
 	if (*(new_line + 1) != '\0')
+	{
+		stash = ft_strdup(new_line + 1);
+		if (!stash)
+			ft_lstclear(head, free);
 		ft_lstadd_back(current, ft_strdup(new_line + 1));
+	}
 	line_str = create_line_str(head, *line_len);
+	if (!line_str)
+		ft_lstclear(head, free);
 	return (line_str);
 }
 
@@ -72,15 +80,18 @@ static ssize_t	read_fd(int fd, char *buffer)
 	bytes_read = read(fd, buffer, BUFFER_SIZE);
 	if (bytes_read > 0)
 		buffer[bytes_read] = '\0';
-	else
-		free(buffer);
 	return (bytes_read);
 }
 
-static void	handle_buffer(t_list **head, t_list **current, char *buffer, size_t *line_len)
+static void	handle_buffer(t_list **head, t_list **current, char *buffer)
 {
-	ft_lstadd_back(head, ft_strdup(buffer));
-	if (!*current)
+	char	*content;
+	
+	content = ft_strdup(buffer);
+	if (!content)
+		ft_lstclear(head, free);
+	ft_lstadd_back(head, content);
+	if (!(*current))
 		*current = *head;
 	else
 		*current = (*current)->next;
@@ -93,7 +104,7 @@ static char	*find_new_line(int fd, char *buffer)
 	ssize_t			bytes_read;
 	char			*line_str;
 	size_t			line_len;
-
+	
 	current = head;
 	line_len = 0;
 	if (head && head->content)
@@ -105,7 +116,7 @@ static char	*find_new_line(int fd, char *buffer)
 	bytes_read = read_fd(fd, buffer);
 	while (bytes_read > 0)
 	{
-		handle_buffer(&head, &current, buffer, &line_len);
+		handle_buffer(&head, &current, buffer);
 		line_str = extract_line(&head, &current, &line_len);
 		if (line_str)
 			return (line_str);
@@ -118,13 +129,17 @@ static char	*find_new_line(int fd, char *buffer)
 
 char	*get_next_line(int fd)
 {
-	char			*buffer;
+	char	*buffer;
+	char	*res_str;
 
 	if (fd < 0 || BUFFER_SIZE < 0 || read(fd, 0, 0) < 0)
 		return (NULL);
 	buffer = (char *)malloc((BUFFER_SIZE + 1) * sizeof(char));
 	if (!buffer)
 		return (NULL);
+	
 	buffer[BUFFER_SIZE] = '\0';
-	return (find_new_line(fd, buffer));
+	res_str = find_new_line(fd, buffer);
+	free(buffer);
+	return (res_str);
 }
