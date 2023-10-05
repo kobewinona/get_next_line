@@ -1,0 +1,34 @@
+head=first >  line > \nseco
+
+head exist
+total_len = 11
+
+first = new line in it?
+no
+total_len += ft_strlen
+ft_lstadd_back(head, buffer)
+
+ line = new line in it?
+no
+total_len += ft_strlen
+ft_lstadd_back(head, buffer)
+
+\nseco = new line in it?
+yes
+total_len += buffer - new_line + 1
+
+read_line_str = malloc 11 chars
+while (i < 11)
+{
+	while (i < 11 && current)
+		new_str[i] = current->content[i];
+		current = current->next;
+		delone(head);
+		head = current;
+		ft_lstadd_front(head, new_line + 1);
+		i++;
+}
+new_str[i] = '\0';
+return new_str;
+
+head=seco -> nd li -> ne\nth
