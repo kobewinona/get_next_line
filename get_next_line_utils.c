@@ -24,7 +24,6 @@ size_t	ft_strlen(const char *s)
 
 char	*ft_strchr(const char *s, int c)
 {
-	// printf("> ft_strchr: s |%s|\n", s);
 	while (*s)
 	{
 		if (*s == (unsigned char)c)
