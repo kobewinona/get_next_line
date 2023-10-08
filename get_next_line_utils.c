@@ -12,35 +12,26 @@
 
 #include "get_next_line.h"
 
-size_t	ft_strlen(const char *s)
+ssize_t	ft_read(int fd, char *buffer)
 {
-	size_t	i;
+	ssize_t	bytes_read;
 
-	i = 0;
-	while (s[i] != '\0')
-		i++;
-	return (i);
-}
-
-char	*ft_strchr(const char *s, int c)
-{
-	while (*s)
-	{
-		if (*s == (unsigned char)c)
-			return ((char *)s);
-		s++;
-	}
-	if ((unsigned char)c == '\0')
-		return ((char *)s);
-	return (NULL);
+	bytes_read = read(fd, buffer, BUFFER_SIZE);
+	if (bytes_read > 0 && bytes_read <= BUFFER_SIZE)
+		buffer[bytes_read] = '\0';
+	return (bytes_read);
 }
 
 char	*ft_strdup(const char *s1)
 {
 	char	*s2;
+	size_t	s1_len;
 	size_t	i;
 
-	s2 = (char *)malloc((ft_strlen(s1) + 1) * sizeof(char));
+	s1_len = 0;
+	while (s1 && s1[s1_len] != '\0')
+		s1_len++;
+	s2 = (char *)malloc((s1_len + 1) * sizeof(char));
 	if (!s2)
 		return (NULL);
 	i = 0;
@@ -51,16 +42,6 @@ char	*ft_strdup(const char *s1)
 	}
 	s2[i] = '\0';
 	return (s2);
-}
-
-void	ft_lstdelone(t_list *lst, void (*del)(void *))
-{
-	if (lst)
-	{
-		if (del)
-			del(lst->content);
-		free(lst);
-	}
 }
 
 void	ft_lstadd_back(t_list **lst, void *content)
@@ -92,6 +73,20 @@ void	ft_lstadd_back(t_list **lst, void *content)
 	}
 }
 
+void	ft_delone(t_list **lst, void (*del)(void *))
+{
+	t_list	*temp;
+
+	temp = *lst;
+	*lst = (*lst)->next;
+	if (temp)
+	{
+		if (del && temp->content)
+			del(temp->content);
+		free(temp);
+	}
+}
+
 void	ft_lstclear(t_list **lst, void (*del)(void *))
 {
 	t_list	*next;
@@ -105,7 +100,8 @@ void	ft_lstclear(t_list **lst, void (*del)(void *))
 			next = next->next;
 			if (*lst && del)
 			{
-				del((*lst)->content);
+				if ((*lst)->content)
+					del((*lst)->content);
 				del(*lst);
 			}
 			*lst = next;

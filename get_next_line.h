@@ -14,7 +14,7 @@
 # define GET_NEXT_LINE_H
 
 # ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 10
+#  define BUFFER_SIZE 5
 # endif
 
 # include <stdarg.h>
@@ -31,11 +31,10 @@ typedef struct s_list
 	struct s_list	*next;
 }					t_list;
 char	*get_next_line(int fd);
-size_t	ft_strlen(const char *s);
-char	*ft_strchr(const char *s, int c);
+ssize_t	ft_read(int fd, char *buffer);
 char	*ft_strdup(const char *s1);
 void	ft_lstadd_back(t_list **lst, void *content);
-void	ft_lstdelone(t_list *lst, void (*del)(void *));
+void	ft_delone(t_list **lst, void (*del)(void *));
 void	ft_lstclear(t_list **lst, void (*del)(void *));
 
 #endif
