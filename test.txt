@@ -1,0 +1,31 @@
+0f 1i 2r 3s 4t 5  6l 7i 8n 9e 10\n 11\0
+1  2  3  4  5  6  7  8  9  10 11   12
+
+0e 1n 2d 3\0
+1  2  3  4
+
+malloc 1 BUFFER_SIZE
+
+first buffer = goes to the list buffer -> buff\ner -> NULL
+
+head pac
+
+static stash
+
+head find new line
+no read file
+yes buffer
+\n
+
+first line\n
+second line\n
+third line\n
+
+buffer =  \nseco
+
+first ->  line -> \nseco
+create a string
+
+ft_lstclear
+
+

@@ -2,6 +2,7 @@
 	"files.associations": {
 		"stdlib.h": "c",
 		"iterator": "c",
-		"istream": "c"
+		"istream": "c",
+		"stdarg.h": "c"
 	}
 }

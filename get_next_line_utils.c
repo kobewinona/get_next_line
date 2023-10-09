@@ -81,10 +81,11 @@ void	ft_delone(t_list **lst, void (*del)(void *))
 	*lst = (*lst)->next;
 	if (temp)
 	{
-		if (del && temp->content)
+		if (del && temp && temp->content)
 			del(temp->content);
 		free(temp);
 	}
+	temp = NULL;
 }
 
 void	ft_lstclear(t_list **lst, void (*del)(void *))
@@ -101,7 +102,10 @@ void	ft_lstclear(t_list **lst, void (*del)(void *))
 			if (*lst && del)
 			{
 				if ((*lst)->content)
+				{
 					del((*lst)->content);
+					(*lst)->content = NULL;
+				}
 				del(*lst);
 			}
 			*lst = next;
