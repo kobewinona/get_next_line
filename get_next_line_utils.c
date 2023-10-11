@@ -32,6 +32,7 @@ char	*ft_strdup(const char *s1)
 	while (s1 && s1[s1_len] != '\0')
 		s1_len++;
 	s2 = (char *)malloc((s1_len + 1) * sizeof(char));
+	// s2 = (char *)malloc(-1);
 	if (!s2)
 		return (NULL);
 	i = 0;
@@ -44,19 +45,14 @@ char	*ft_strdup(const char *s1)
 	return (s2);
 }
 
-void	ft_lstadd_back(t_list **lst, void *content)
+int	ft_lstadd_back(t_list **lst, void *content)
 {
 	t_list	*new;
 	t_list	*current;
 
 	new = (t_list *)malloc(sizeof(t_list));
 	if (!new)
-		return ;
-	if (!content)
-	{
-		new->content = (NULL);
-		new->next = (NULL);
-	}
+		return (0);
 	else
 	{
 		new->content = content;
@@ -71,6 +67,7 @@ void	ft_lstadd_back(t_list **lst, void *content)
 			current = current->next;
 		current->next = new;
 	}
+	return (1);
 }
 
 void	ft_delone(t_list **lst, void (*del)(void *))

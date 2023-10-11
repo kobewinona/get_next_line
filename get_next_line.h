@@ -33,7 +33,7 @@ typedef struct s_list
 char	*get_next_line(int fd);
 ssize_t	ft_read(int fd, char *buffer);
 char	*ft_strdup(const char *s1);
-void	ft_lstadd_back(t_list **lst, void *content);
+int		ft_lstadd_back(t_list **lst, void *content);
 void	ft_delone(t_list **lst, void (*del)(void *));
 void	ft_lstclear(t_list **lst, void (*del)(void *));
 
