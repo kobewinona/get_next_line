@@ -12,26 +12,19 @@
 
 #include "get_next_line.h"
 
-static int	handle_error(t_list **head, char *buffer, char *content)
+static char	*handle_error(t_list **head, char *buff)
 {
-	if (!content)
+	if (*head)
 	{
-		if (*head)
-		{
-			ft_lstclear(head, free);
-			*head = NULL;
-		}
-		if (buffer)
-		{
-			free(buffer);
-			buffer = NULL;
-		}
-		return (1);
+		while (*head)
+			ft_delone(head, free);
 	}
-	return (0);
+	if (buff)
+		free(buff);
+	return (NULL);
 }
 
-static char	*create_line_str(t_list **head, size_t line_len)
+static char	*create_line_str(t_list **head, size_t len)
 {
 	t_list	*current;
 	char	*line_str;
@@ -39,14 +32,14 @@ static char	*create_line_str(t_list **head, size_t line_len)
 	size_t	j;
 
 	current = *head;
-	line_str = (char *)malloc((line_len + 1) * sizeof(char));
+	line_str = (char *)malloc((len + 1) * sizeof(char));
 	if (!line_str)
-		return (NULL);
+		return (handle_error(head, NULL));
 	i = 0;
-	while (i < line_len && current)
+	while (i < len && current)
 	{
 		j = 0;
-		while (current && current->content[j] && i < line_len)
+		while (current->content[j] && i < len)
 		{
 			line_str[i++] = current->content[j];
 			if (current->content[j++] == '\n')
@@ -59,36 +52,17 @@ static char	*create_line_str(t_list **head, size_t line_len)
 	return (line_str);
 }
 
-static char	*find_new_line(char *buffer, size_t *line_len)
+static int	handle_buff(t_list **head, char *buff)
 {
-	ssize_t	i;
-
-	i = 0;
-	while (buffer && buffer[i] != '\0')
-	{
-		if (buffer[i] == '\n')
-		{
-			*line_len += i + 1;
-			return (&buffer[i]);
-		}
-		i++;
-	}
-	*line_len += i;
-	return (NULL);
-}
-
-static int	handle_buffer(t_list **head, char *buffer)
-{
-	char	*content;
 	t_list	*current;
 
 	current = *head;
-	content = ft_strdup(buffer);
-	if (!content)
-		return (0);
-	if (!ft_lstadd_back(head, content))
+	if (!ft_lstadd_back(head, buff))
 	{
-		free(content);
+		while (*head)
+			ft_delone(head, free);
+		if (buff)
+			free(buff);
 		return (0);
 	}
 	if (!current)
@@ -98,93 +72,59 @@ static int	handle_buffer(t_list **head, char *buffer)
 	return (1);
 }
 
-static char	*read_file(int fd, char *buffer, t_list **head, size_t *line_len)
+static char	*read_file(int fd, char *buff, t_list **head, size_t *len)
 {
 	ssize_t	bytes_read;
-	char	*new_line;
-	char	*stash;
-	char	*line_str;
+	char	*nl;
 
-	bytes_read = ft_read(fd, buffer);
+	bytes_read = ft_read(fd, buff);
 	while (bytes_read > 0)
 	{
-		if (!handle_buffer(head, buffer))
+		if (handle_buff(head, buff) == 0)
 			return (NULL);
-		new_line = find_new_line(buffer, line_len);
-		if (new_line)
+		nl = find_nl(buff, len);
+		if (nl)
 		{
-			if (*(new_line + 1) != '\0')
-			{
-				stash = ft_strdup((new_line + 1));
-				if (!stash)
-					return (NULL);
-				if (!ft_lstadd_back(head, stash))
-				{
-					free(stash);
-					return (NULL);
-				}
-			}
-			line_str = create_line_str(head, *line_len);
-			if (!line_str)
-				return (NULL);
-			return (line_str);
+			if (*(nl + 1) != '\0' && !ft_lstadd_back(head, (nl + 1)))
+				return (handle_error(head, buff));
+			free(buff);
+			return (create_line_str(head, *len));
 		}
-		bytes_read = ft_read(fd, buffer);
+		bytes_read = ft_read(fd, buff);
 	}
+	free(buff);
 	if (bytes_read == 0 && *head && (*head)->content)
-	{
-		line_str = create_line_str(head, *line_len);
-		if (!line_str)
-			return (NULL);
-		return (line_str);
-	}
+		return (create_line_str(head, *len));
 	if (bytes_read < 0 && *head)
-		ft_lstclear(head, free);
+		ft_delone(head, free);
 	return (NULL);
 }
 
 char	*get_next_line(int fd)
 {
 	static t_list	*head;
-	char			*new_line;
-	char			*line_str;
-	char			*buffer;
-	size_t			line_len;
-	char			*stash;
+	char			*nl;
+	char			*buff;
+	size_t			len;
 
-	line_str = NULL;
 	if (fd < 0 || BUFFER_SIZE < 1)
 		return (NULL);
-	line_len = 0;
+	len = 0;
 	if (head && head->content)
 	{
-		new_line = find_new_line(head->content, &line_len);
-		if (new_line)
+		nl = find_nl(head->content, &len);
+		if (nl)
 		{
-			if (*(new_line + 1) != '\0')
+			if (*(nl + 1) != '\0')
 			{
-				stash = ft_strdup((new_line + 1));
-				if (handle_error(&head, NULL, stash))
-					return (NULL);
-				if (!ft_lstadd_back(&head, stash))
-				{
-					free(stash);
-					ft_lstclear(&head, free);
-					return (NULL);
-				}
+				if (!ft_lstadd_back(&head, (nl + 1)))
+					return (handle_error(&head, NULL));
 			}
-			line_str = create_line_str(&head, line_len);
-			if (handle_error(&head, NULL, line_str))
-				return (NULL);
-			return (line_str);
+			return (create_line_str(&head, len));
 		}
 	}
-	buffer = (char *)malloc((BUFFER_SIZE + 1) * sizeof(char));
-	if (handle_error(&head, buffer, buffer))
-		return (NULL);
-	line_str = read_file(fd, buffer, &head, &line_len);
-	if (handle_error(&head, buffer, line_str))
-		return (NULL);
-	free(buffer);
-	return (line_str);
+	buff = (char *)malloc((BUFFER_SIZE + 1) * sizeof(char));
+	if (!buff)
+		return (handle_error(&head, buff));
+	return (read_file(fd, buff, &head, &len));
 }

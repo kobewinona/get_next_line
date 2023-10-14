@@ -31,10 +31,10 @@ typedef struct s_list
 	struct s_list	*next;
 }					t_list;
 char	*get_next_line(int fd);
+char	*find_nl(char *buff, size_t *len);
 ssize_t	ft_read(int fd, char *buffer);
 char	*ft_strdup(const char *s1);
 int		ft_lstadd_back(t_list **lst, void *content);
 void	ft_delone(t_list **lst, void (*del)(void *));
-void	ft_lstclear(t_list **lst, void (*del)(void *));
 
 #endif

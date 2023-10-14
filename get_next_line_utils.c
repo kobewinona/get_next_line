@@ -12,6 +12,24 @@
 
 #include "get_next_line.h"
 
+char	*find_nl(char *buff, size_t *len)
+{
+	ssize_t	i;
+
+	i = 0;
+	while (buff && buff[i] != '\0')
+	{
+		if (buff[i] == '\n')
+		{
+			*len += i + 1;
+			return (&buff[i]);
+		}
+		i++;
+	}
+	*len += i;
+	return (NULL);
+}
+
 ssize_t	ft_read(int fd, char *buffer)
 {
 	ssize_t	bytes_read;
@@ -52,11 +70,13 @@ int	ft_lstadd_back(t_list **lst, void *content)
 	new = (t_list *)malloc(sizeof(t_list));
 	if (!new)
 		return (0);
-	else
+	new->content = ft_strdup(content);
+	if (!new->content)
 	{
-		new->content = content;
-		new->next = (NULL);
+		free(new);
+		return (0);
 	}
+	new->next = (NULL);
 	if (*lst == NULL)
 		*lst = new;
 	else
@@ -80,31 +100,5 @@ void	ft_delone(t_list **lst, void (*del)(void *))
 		if (del && temp && temp->content)
 			del(temp->content);
 		free(temp);
-	}
-	temp = NULL;
-}
-
-void	ft_lstclear(t_list **lst, void (*del)(void *))
-{
-	t_list	*next;
-
-	if (lst)
-		next = *lst;
-	if (del)
-	{
-		while (next)
-		{
-			next = next->next;
-			if (*lst && del)
-			{
-				if ((*lst)->content)
-				{
-					del((*lst)->content);
-					(*lst)->content = NULL;
-				}
-				del(*lst);
-			}
-			*lst = next;
-		}
 	}
 }
