@@ -16,10 +16,16 @@ static int	handle_error(t_list **head, char *buffer, char *content)
 {
 	if (!content)
 	{
-		ft_lstclear(head, free);
-		*head = NULL;
+		if (*head)
+		{
+			ft_lstclear(head, free);
+			*head = NULL;
+		}
 		if (buffer)
+		{
 			free(buffer);
+			buffer = NULL;
+		}
 		return (1);
 	}
 	return (0);
@@ -53,23 +59,15 @@ static char	*create_line_str(t_list **head, size_t line_len)
 	return (line_str);
 }
 
-static char	*find_new_line(t_list **head, char *buffer, size_t *line_len)
+static char	*find_new_line(char *buffer, size_t *line_len)
 {
 	ssize_t	i;
-	char	*stash;
 
 	i = 0;
 	while (buffer && buffer[i] != '\0')
 	{
 		if (buffer[i] == '\n')
 		{
-			if (buffer[i + 1] != '\0')
-			{
-				stash = ft_strdup(&(buffer[i + 1]));
-				if (handle_error(head, buffer, stash))
-					return (NULL);
-				ft_lstadd_back(head, stash);
-			}
 			*line_len += i + 1;
 			return (&buffer[i]);
 		}
@@ -86,9 +84,13 @@ static int	handle_buffer(t_list **head, char *buffer)
 
 	current = *head;
 	content = ft_strdup(buffer);
-	if (handle_error(head, buffer, content))
+	if (!content)
 		return (0);
-	ft_lstadd_back(head, content);
+	if (!ft_lstadd_back(head, content))
+	{
+		free(content);
+		return (0);
+	}
 	if (!current)
 		current = *head;
 	else
@@ -100,22 +102,43 @@ static char	*read_file(int fd, char *buffer, t_list **head, size_t *line_len)
 {
 	ssize_t	bytes_read;
 	char	*new_line;
+	char	*stash;
+	char	*line_str;
 
 	bytes_read = ft_read(fd, buffer);
-	if (bytes_read > 0)
-		buffer[bytes_read] = '\0';
 	while (bytes_read > 0)
 	{
 		if (!handle_buffer(head, buffer))
 			return (NULL);
-		new_line = find_new_line(head, buffer, line_len);
+		new_line = find_new_line(buffer, line_len);
 		if (new_line)
-			return (create_line_str(head, *line_len));
+		{
+			if (*(new_line + 1) != '\0')
+			{
+				stash = ft_strdup((new_line + 1));
+				if (!stash)
+					return (NULL);
+				if (!ft_lstadd_back(head, stash))
+				{
+					free(stash);
+					return (NULL);
+				}
+			}
+			line_str = create_line_str(head, *line_len);
+			if (!line_str)
+				return (NULL);
+			return (line_str);
+		}
 		bytes_read = ft_read(fd, buffer);
 	}
 	if (bytes_read == 0 && *head && (*head)->content)
-		return (create_line_str(head, *line_len));
-	if (bytes_read < 0 && head)
+	{
+		line_str = create_line_str(head, *line_len);
+		if (!line_str)
+			return (NULL);
+		return (line_str);
+	}
+	if (bytes_read < 0 && *head)
 		ft_lstclear(head, free);
 	return (NULL);
 }
@@ -127,15 +150,34 @@ char	*get_next_line(int fd)
 	char			*line_str;
 	char			*buffer;
 	size_t			line_len;
+	char			*stash;
 
+	line_str = NULL;
 	if (fd < 0 || BUFFER_SIZE < 1)
 		return (NULL);
 	line_len = 0;
 	if (head && head->content)
 	{
-		new_line = find_new_line(&head, head->content, &line_len);
+		new_line = find_new_line(head->content, &line_len);
 		if (new_line)
-			return (create_line_str(&head, line_len));
+		{
+			if (*(new_line + 1) != '\0')
+			{
+				stash = ft_strdup((new_line + 1));
+				if (handle_error(&head, NULL, stash))
+					return (NULL);
+				if (!ft_lstadd_back(&head, stash))
+				{
+					free(stash);
+					ft_lstclear(&head, free);
+					return (NULL);
+				}
+			}
+			line_str = create_line_str(&head, line_len);
+			if (handle_error(&head, NULL, line_str))
+				return (NULL);
+			return (line_str);
+		}
 	}
 	buffer = (char *)malloc((BUFFER_SIZE + 1) * sizeof(char));
 	if (handle_error(&head, buffer, buffer))
