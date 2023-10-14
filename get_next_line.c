@@ -103,8 +103,8 @@ static char	*read_file(int fd, char *buff, t_list **head, size_t *len)
 char	*get_next_line(int fd)
 {
 	static t_list	*head;
-	char			*nl;
 	char			*buff;
+	char			*nl;
 	size_t			len;
 
 	if (fd < 0 || BUFFER_SIZE < 1)

@@ -17,6 +17,11 @@
 #  define BUFFER_SIZE 10
 # endif
 
+# if BUFFER_SIZE < 1000
+#  undef BUFFER_SIZE
+#  define BUFFER_SIZE 1000
+# endif
+
 # include <stdarg.h>
 # include <stdio.h>
 # include <limits.h>
