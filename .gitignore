@@ -1,4 +1,18 @@
-.DS_store
+# IDE
+.vscode
+.idea
+so_long.dSYM
+
+# program
 a.out
+so_long
+so_long_asan
 main.c
+.main.c
+
+#objects
+obj
+
+# rest
+.DS_store
 *.txt

@@ -1,5 +1,3 @@
-.PHONY: all clean fclean re bonus
-
 NAME	= libgnl.a
 CC		= gcc
 CFLAGS	= -Wall -Wextra -Werror
