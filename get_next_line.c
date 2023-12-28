@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "libgnl_internal.h"
 
 static char	*handle_error(t_list **head, char *buff)
 {
@@ -57,7 +57,7 @@ static int	handle_buff(t_list **head, char *buff)
 	t_list	*current;
 
 	current = *head;
-	if (!ft_lstadd_back(head, buff))
+	if (!ftm_lstadd_back(head, buff))
 	{
 		while (*head)
 			ft_delone(head, free);
@@ -85,7 +85,7 @@ static char	*read_file(int fd, char *buff, t_list **head, size_t *len)
 		nl = find_nl(buff, len);
 		if (nl)
 		{
-			if (*(nl + 1) != '\0' && !ft_lstadd_back(head, (nl + 1)))
+			if (*(nl + 1) != '\0' && !ftm_lstadd_back(head, (nl + 1)))
 				return (handle_error(head, buff));
 			free(buff);
 			return (create_line_str(head, *len));
@@ -117,7 +117,7 @@ char	*get_next_line(int fd)
 		{
 			if (*(nl + 1) != '\0')
 			{
-				if (!ft_lstadd_back(&head, (nl + 1)))
+				if (!ftm_lstadd_back(&head, (nl + 1)))
 					return (handle_error(&head, NULL));
 			}
 			return (create_line_str(&head, len));

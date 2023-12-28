@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "libgnl_internal.h"
 
 char	*find_nl(char *buff, size_t *len)
 {
@@ -40,7 +40,7 @@ ssize_t	ft_read(int fd, char *buffer)
 	return (bytes_read);
 }
 
-char	*ft_strdup(const char *s1)
+char	*ftm_strdup(const char *s1)
 {
 	char	*s2;
 	size_t	s1_len;
@@ -62,7 +62,7 @@ char	*ft_strdup(const char *s1)
 	return (s2);
 }
 
-int	ft_lstadd_back(t_list **lst, void *content)
+int	ftm_lstadd_back(t_list **lst, void *content)
 {
 	t_list	*new;
 	t_list	*current;
@@ -70,7 +70,7 @@ int	ft_lstadd_back(t_list **lst, void *content)
 	new = (t_list *)malloc(sizeof(t_list));
 	if (!new)
 		return (0);
-	new->content = ft_strdup(content);
+	new->content = ftm_strdup(content);
 	if (!new->content)
 	{
 		free(new);

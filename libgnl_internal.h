@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.h                                    :+:      :+:    :+:   */
+/*   get_next_line_internal.h                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: dklimkin <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/09/26 13:14:04 by dklimkin          #+#    #+#             */
-/*   Updated: 2023/09/26 13:14:05 by dklimkin         ###   ########.fr       */
+/*   Created: 2023/12/11 20:28:43 by dklimkin          #+#    #+#             */
+/*   Updated: 2023/12/11 20:28:44 by dklimkin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef GET_NEXT_LINE_H
-# define GET_NEXT_LINE_H
+#ifndef LIBGNL_INTERNAL_H
+# define LIBGNL_INTERNAL_H
 
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 10
@@ -33,8 +33,8 @@ typedef struct s_list
 char	*get_next_line(int fd);
 char	*find_nl(char *buff, size_t *len);
 ssize_t	ft_read(int fd, char *buffer);
-char	*ft_strdup(const char *s1);
-int		ft_lstadd_back(t_list **lst, void *content);
+char	*ftm_strdup(const char *s1);
+int		ftm_lstadd_back(t_list **lst, void *content);
 void	ft_delone(t_list **lst, void (*del)(void *));
 
 #endif
