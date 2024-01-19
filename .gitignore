@@ -1,14 +1,10 @@
 # IDE
 .vscode
 .idea
-so_long.dSYM
+*.dSYM
 
 # program
 a.out
-so_long
-so_long_asan
-main.c
-.main.c
 
 #objects
 obj
